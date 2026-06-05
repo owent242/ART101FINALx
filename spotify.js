@@ -1,4 +1,4 @@
-// =====usage =====
+// usage
 //
 // spotify.handleRedirect();   // call once when the page loads
 // spotify.login();            // send the user to log in (e.g. on a button)
@@ -8,7 +8,7 @@
 //
 // All functions are async (use await / .then()).
 //
-// ===== Functions =====
+// Functions
 // Auth:            login()  handleRedirect()  isLoggedIn()  logout()
 // Search (→array): searchTracks(kw)  searchPlaylists(kw)  searchArtists(kw)  searchAlbums(kw)
 // By ID:           getTrack(id)  getArtist(id)  getArtistTopTracks(id)  getAlbum(id)
@@ -21,8 +21,8 @@
 // Read results: track.name / track.artists[0].name / track.external_urls.spotify / track.uri
 //               Lists are wrapped: search → .tracks.items, getMyPlaylists() → .items
 
-const CLIENT_ID    = "Put the client id here.";
-const REDIRECT_URI = "http://127.0.0.1:8000/";
+const CLIENT_ID    = "6f2c0ebba56241a7b3164414f1b59f93";
+const REDIRECT_URI = "https://owent242.github.io/ART101FINALx/";
 const API          = "https://api.spotify.com/v1";
 
 
