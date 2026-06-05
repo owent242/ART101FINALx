@@ -63,7 +63,7 @@ async function apiSend(method, path, body) {
         },
         body: body ? JSON.stringify(body) : undefined
     });
-    const text = await res.text();            // 播放/暂停这类操作没有返回内容
+    const text = await res.text();
     return text ? JSON.parse(text) : null;
 }
 
