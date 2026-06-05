@@ -81,7 +81,7 @@ const spotify = {
         });
         location.href = "https://accounts.spotify.com/authorize?" + query;
     },
-    async handleRedirect() {                  // 页面加载时调用一次
+    async handleRedirect() {
         const code = new URLSearchParams(location.search).get("code");
         if (!code) return;
         const res = await fetch("https://accounts.spotify.com/api/token", {
@@ -92,7 +92,7 @@ const spotify = {
                 redirect_uri: REDIRECT_URI, code_verifier: localStorage.getItem("verifier")
             })
         });
-        localStorage.setItem("token", (await res.json()).access_token);  // 约 1 小时有效
+        localStorage.setItem("token", (await res.json()).access_token);
         history.replaceState(null, "", REDIRECT_URI);
     },
     isLoggedIn() { return !!localStorage.getItem("token"); },
