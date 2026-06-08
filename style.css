@@ -1,28 +1,26 @@
-/* ==========================================================================
-   DESIGN SYSTEM CONFIGURATION & GLOBAL VARIABLES
-   ========================================================================== */
+/* Global variables */
 :root {
-  /* UI REDESIGN: Custom ambient background color syntax inspired by modern music platform dark-modes */
+  /* Background colors */
   --bg-gradient: linear-gradient(135deg, #0f0c20 0%, #061712 50%, #050508 100%);
   --spotify-green: #1db954;
   --spotify-hover: #1ed760;
   --text-main: #ffffff;
   --text-muted: #a7a7a7;
   
-  /* UI REDESIGN: Glassmorphism parameters utilizing low-opacity whites and subtle green glowing shadows */
+  /* Glass effect */
   --glass-bg: rgba(255, 255, 255, 0.03);
   --glass-border: rgba(255, 255, 255, 0.07);
   --glass-glow: rgba(29, 185, 84, 0.15);
 }
 
-/* Global resets to enforce proper geometric structure across components */
+/* Reset */
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
-/* Full-viewport alignment grid to center the main interface block perfectly */
+/* Center layout */
 body {
   background: var(--bg-gradient);
   color: var(--text-main);
@@ -32,50 +30,42 @@ body {
   align-items: center;
   padding: 24px;
   overflow-x: hidden;
-  font-family: 'Plus Jakarta Sans', sans-serif; /* Enforcing custom premium typography */
-  -webkit-font-smoothing: antialiased; /* Renders cleaner text vectors on high-res displays */
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
 
-/* ==========================================================================
-   GLASSMORPHISM CONTAINER LAYOUT
-   ========================================================================== */
+/* Main container */
 .glass-container {
   width: 100%;
-  max-width: 680px; /* Constrains layouts gracefully on desktop viewports */
+  max-width: 680px;
   background: var(--glass-bg);
-  backdrop-filter: blur(20px); /* Core CSS modifier to blend background imagery softly */
+  backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid var(--glass-border);
   border-radius: 24px;
   padding: 40px;
-  /* Dual layer shadow structure: one for real depth, one for specialized glowing immersion */
   box-shadow: 0 20px 50px rgba(0,0,0,0.4), 0 0 40px var(--glass-glow);
   transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* ==========================================================================
-   SMOOTH TRANSITION & VISIBILITY CARD CAROUSEL
-   ========================================================================== */
-/* Hide inactive cards by default */
+/* Card transitions */
 .app-card {
-  display: none;
+  display: none;/* Hidden cards */
 }
 
-/* UI REDESIGN: Active selector hooked via custom JS timeline functions to spin up motion states */
+/* Active card */
 .app-card.active {
   display: block;
   animation: fadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-/* Fine-tuned cubic micro-translation entry trajectory */
+/* Fade animation */
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* ==========================================================================
-   TYPOGRAPHY & BRANDING CONTROLS
-   ========================================================================== */
+/* Branding */
 .logo-badge {
   display: inline-block;
   background: rgba(29, 185, 84, 0.15);
@@ -96,7 +86,7 @@ body {
   color: var(--spotify-green);
 }
 
-/* Injected sleek text-masking gradient transitioning white elegantly into brand green */
+/* Gradient title */
 h1 {
   font-size: 36px;
   font-weight: 800;
@@ -116,12 +106,9 @@ h1 {
   margin-bottom: 32px;
 }
 
-/* ==========================================================================
-   INTERACTIVE BUTTON MICRO-INTERACTIONS
-   ========================================================================== */
-/* Main call-to-action button wrapper */
+/* Buttons */
 .btn-primary {
-  background: var(--spotify-green);
+  background: var(--spotify-green); /* Primary button */
   color: #000;
   border: none;
   font-weight: 700;
@@ -135,21 +122,21 @@ h1 {
   transition: all 0.2s ease;
 }
 
-/* Magnification scale and glow shadow projection upon user hover */
+/* Hover effect */
 .btn-primary:hover:not(:disabled) {
   background: var(--spotify-hover);
   transform: scale(1.03);
   box-shadow: 0 0 20px rgba(29, 185, 84, 0.4);
 }
 
-/* Disabled state mapping requested by backend logic dependencies */
+/* Disabled state */
 .btn-primary:disabled {
   background: #333;
   color: #777;
   cursor: not-allowed;
 }
 
-/* Minimalist navigation controller styling (Back/Reset triggers) */
+/* Secondary button */
 .btn-secondary {
   background: rgba(255,255,255,0.06);
   color: #fff;
@@ -169,9 +156,7 @@ h1 {
   background: rgba(255,255,255,0.12);
 }
 
-/* ==========================================================================
-   DYNAMIC PROGRESS UI STRIPS
-   ========================================================================== */
+/* Progress bar */
 .quiz-header {
   display: flex;
   justify-content: space-between;
@@ -192,13 +177,13 @@ h1 {
   margin-bottom: 32px;
 }
 
-/* Dynamic slider strip managed by step increments inside script.js */
+/* Progress indicator */
 .progress-indicator {
   height: 100%;
-  width: 0%; /* Driven dynamically by JavaScript algorithms */
+  width: 0%;
   background: var(--spotify-green);
   border-radius: 2px;
-  transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1); /* Ultra-smooth slide curve */
+  transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .question-title {
@@ -207,9 +192,7 @@ h1 {
   margin-bottom: 24px;
 }
 
-/* ==========================================================================
-   QUIZ OPTIONS MODULE
-   ========================================================================== */
+/* Quiz options */
 .options-grid {
   display: flex;
   flex-direction: column;
@@ -217,7 +200,7 @@ h1 {
   margin-bottom: 32px;
 }
 
-/* Large clickable card layouts replacing basic native inputs for premium mobile feel */
+/* Option buttons */
 .opt-btn {
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid var(--glass-border);
@@ -236,7 +219,7 @@ h1 {
   border-color: rgba(255,255,255,0.2);
 }
 
-/* Selected state mapping injected on active state callbacks */
+/* Selected option */
 .opt-btn.selected {
   background: rgba(29, 185, 84, 0.12);
   border-color: var(--spotify-green);
@@ -251,9 +234,7 @@ h1 {
   align-items: center;
 }
 
-/* ==========================================================================
-   DASHBOARD GENERATOR LAYOUT
-   ========================================================================== */
+/* Results section */
 .gradient-text {
   font-size: 32px;
   font-weight: 800;
@@ -265,7 +246,7 @@ h1 {
   color: var(--text-muted);
   font-size: 14px;
   margin-bottom: 32px;
-  border-left: 2px solid var(--spotify-green); /* Visual branding structural bar */
+  border-left: 2px solid var(--spotify-green);
   padding-left: 12px;
 }
 
@@ -303,7 +284,7 @@ h1 {
   transition: all 0.2s ease;
 }
 
-/* Micro horizontal translation on link hover to provide positive kinetic click clues */
+/* Playlist hover */
 .playlist-card:hover {
   background: rgba(255,255,255,0.07);
   border-color: rgba(255,255,255,0.15);
@@ -320,9 +301,7 @@ h1 {
   color: var(--text-muted); 
 }
 
-/* ==========================================================================
-   SONG COMPONENT ROWS
-   ========================================================================== */
+/* Song list */
 .songs-list { 
   display: flex; 
   flex-direction: column; 
