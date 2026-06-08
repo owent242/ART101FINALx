@@ -271,29 +271,17 @@ function showResults() {
 
   var mood = getMood();
   document.getElementById('results-title').textContent = mood.title;
-  var tag = document.getElementById('mood-tag');
 
-  if(mood.title === "Rainy Day Thoughts"){
-    tag.innerHTML = "🌧 Sad Mood";
-  }
-  else if(mood.title === "Beast Mode"){
-    tag.innerHTML = "⚡ High Energy";
-  }
-  else if(mood.title === "Floating"){
-    tag.innerHTML = "🌌 Chill Vibes";
-  }
-  else if(mood.title === "Lets Go Out"){
-    tag.innerHTML = "🎉 Party Mode";
-  }
-  else{
-    tag.innerHTML = "🎵 Personalized Mix";
-  }
+  var tag = document.getElementById('mood-tag');
+  if (mood.title === "Rainy Day Thoughts") { tag.innerHTML = "🌧 Sad Mood"; }
+  else if (mood.title === "Beast Mode")    { tag.innerHTML = "⚡ High Energy"; }
+  else if (mood.title === "Floating")      { tag.innerHTML = "🌌 Chill Vibes"; }
+  else if (mood.title === "Lets Go Out")   { tag.innerHTML = "🎉 Party Mode"; }
+  else                                     { tag.innerHTML = "🎵 Personalized Mix"; }
   document.getElementById('results-desc').textContent = mood.desc;
 
- // Show playlists
   var playlistArea = document.getElementById('playlists-area');
   playlistArea.innerHTML = '';
-
   for (var i = 0; i < mood.playlists.length; i++) {
     var p = mood.playlists[i];
     var card = document.createElement('a');
@@ -304,55 +292,47 @@ function showResults() {
     playlistArea.appendChild(card);
   }
 
-// Get tracks from Spotify
   var songsArea = document.getElementById('songs-area');
   songsArea.innerHTML = '<div style="color:var(--text-muted); font-size:13px; padding:8px;">Loading live matches...</div>';
-  currentTrackUris = []; // Clear previous tracks
+  currentTrackUris = [];
+
+  var keyword = ((answers[3] || '') + ' ' + (answers[2] || '')).trim() || mood.title;
 
   if (typeof spotify !== 'undefined' && spotify.isLoggedIn()) {
-// Search tracks
-    spotify.searchTracks(mood.title).then(function(liveTracks) {
-      songsArea.innerHTML = ''; // Remove loading text
-      
-      // Use default songs if search fails
+    spotify.searchTracks(keyword).then(function (liveTracks) {
+      songsArea.innerHTML = '';
       var tracksToRender = (liveTracks && liveTracks.length > 0) ? liveTracks : mood.songs;
-      
+
       for (var j = 0; j < Math.min(tracksToRender.length, 5); j++) {
         var track = tracksToRender[j];
-        
-        // Get song info
-        var songName = track.name;
+        var songName   = track.name;
         var artistName = track.artists ? track.artists[0].name : track.artist;
-        var playLink = track.external_urls ? track.external_urls.spotify : track.link;
-        
-        if (track.uri) {
-          currentTrackUris.push(track.uri); // Save track URI
-        }
+        var playLink   = track.external_urls ? track.external_urls.spotify : track.link;
+        if (track.uri) { currentTrackUris.push(track.uri); }
 
         var row = document.createElement('div');
         row.className = 'song-row';
         row.innerHTML =
-          '<span class="song-num">' + (j + 1) + '</span>' +
-          '<div class="song-info">' +
+            '<span class="song-num">' + (j + 1) + '</span>' +
+            '<div class="song-info">' +
             '<div class="song-name">' + songName + '</div>' +
             '<div class="song-artist">' + artistName + '</div>' +
-          '</div>' +
-          '<a class="song-link" href="' + playLink + '" target="_blank">play</a>';
+            '</div>' +
+            '<a class="song-link" href="' + playLink + '" target="_blank">play</a>';
         songsArea.appendChild(row);
       }
 
-      // Add playlist button
       if (currentTrackUris.length > 0) {
         var exportBtn = document.createElement('button');
         exportBtn.className = 'btn-primary';
         exportBtn.style.width = '100%';
         exportBtn.style.marginTop = '16px';
         exportBtn.innerHTML = '<span>Save to My Spotify Account</span>';
-        exportBtn.onclick = function() {
-          exportToSpotifyPlaylist(mood.title);
-        };
+        exportBtn.onclick = function () { exportToSpotifyPlaylist(mood.title); };
         songsArea.appendChild(exportBtn);
       }
+    }).catch(function (err) {
+      renderFallbackTracks(mood.songs);
     });
   } else {
     renderFallbackTracks(mood.songs);
