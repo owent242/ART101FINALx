@@ -322,15 +322,7 @@ function showResults() {
         songsArea.appendChild(row);
       }
 
-      if (currentTrackUris.length > 0) {
-        var exportBtn = document.createElement('button');
-        exportBtn.className = 'btn-primary';
-        exportBtn.style.width = '100%';
-        exportBtn.style.marginTop = '16px';
-        exportBtn.innerHTML = '<span>Save to My Spotify Account</span>';
-        exportBtn.onclick = function () { exportToSpotifyPlaylist(mood.title); };
-        songsArea.appendChild(exportBtn);
-      }
+
     }).catch(function (err) {
       renderFallbackTracks(mood.songs);
     });
