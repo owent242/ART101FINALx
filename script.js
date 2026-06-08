@@ -63,7 +63,6 @@ var moodDB = {
       { name: "The Night Will Always Win", artist: "Manchester Orchestra", link: "https://open.spotify.com/search/The%20Night%20Will%20Always%20Win" }
     ]
   },
-
   "energized+workout+uplifting+electronic+max": {
     title: "Beast Mode",
     desc: "Turn it up. You got this.",
@@ -80,7 +79,6 @@ var moodDB = {
       { name: "Turn Down for What", artist: "DJ Snake and Lil Jon", link: "https://open.spotify.com/search/Turn%20Down%20for%20What" }
     ]
   },
-
   "calm+chill+dreamy+electronic+mellow": {
     title: "Floating",
     desc: "Just relax and let the music do its thing.",
@@ -97,7 +95,6 @@ var moodDB = {
       { name: "Motion",        artist: "Tycho",         link: "https://open.spotify.com/search/Motion%20Tycho" }
     ]
   },
-
   "hype+social+uplifting+hiphop+max": {
     title: "Lets Go Out",
     desc: "Pre-game playlist. You already know.",
@@ -114,7 +111,6 @@ var moodDB = {
       { name: "Bad and Boujee",  artist: "Migos",              link: "https://open.spotify.com/search/Bad%20and%20Boujee%20Migos" }
     ]
   },
-
   "default": {
     title: "Here is Your Mix",
     desc: "We picked some good ones for you.",
@@ -136,12 +132,12 @@ var moodDB = {
 var currentQ = 0;
 var answers = [];
 var selected = null;
+var currentTrackUris = []; // TEAM LOGIC: Stores active track URIs for the playlist creation feature
 
 /* ==========================================================================
    UI REDESIGN SECTION - CREATED BY C LIAO
    ========================================================================== */
-// C Liao: Smooth Animated Transition Card Switcher. 
-// Rationale: Replaces instant display toggles with a micro-timeout sequence allowing proper CSS opacity transitions.
+// C Liao: Smooth Animated Transition Card Switcher.
 function switchCard(hideId, showId) {
   document.getElementById(hideId).classList.remove('active');
   setTimeout(function() {
@@ -154,8 +150,19 @@ function switchCard(hideId, showId) {
   }, 200);
 }
 
+// C Liao: Initial page initialization wrapper checking Spotify URL redirects
+window.onload = function() {
+  if (typeof spotify !== 'undefined') {
+    spotify.handleRedirect(); // Automatically intercept incoming tokens from Spotify dashboard redirections
+  }
+};
+
 function startQuiz() {
-  // C Liao: Applied smooth card transition system instead of hard switching display styles
+  // C Liao: Redirects unauthenticated users to Spotify Account Login if session token is missing
+  if (typeof spotify !== 'undefined' && !spotify.isLoggedIn()) {
+    spotify.login(); // Triggers the teammate's built-in OAuth login flow
+    return;
+  }
   switchCard('welcome-section', 'quiz-section');
   showQuestion();
 }
@@ -167,14 +174,12 @@ function showQuestion() {
   var q = questions[currentQ];
   
   // C Liao: Dynamic Progress Bar Indicator Logic.
-  // Rationale: Calculates completion percentage and directly streams it to the fluid progress strip width modifier.
   var pct = ((currentQ + 1) / questions.length) * 100;
   document.getElementById('progress-indicator').style.width = pct + '%';
 
   document.getElementById('q-counter').textContent = "Question " + (currentQ + 1) + " of " + questions.length;
   document.getElementById('q-text').textContent = q.text;
 
-  // C Liao: Modified button tracking configurations using modern visual visibility instead of raw block display properties
   if (currentQ == 0) {
     document.getElementById('btn-back').style.visibility = 'hidden';
   } else {
@@ -264,11 +269,9 @@ function getMood() {
 }
 
 function showResults() {
-  // C Liao: Implemented step transition lifecycle hooks instead of instant layout switching
   switchCard('quiz-section', 'results-section');
 
   var mood = getMood();
-
   document.getElementById('results-title').textContent = mood.title;
   var tag = document.getElementById('mood-tag');
 
@@ -289,6 +292,7 @@ function showResults() {
   }
   document.getElementById('results-desc').textContent = mood.desc;
 
+  // 1. Render Playlists Column using local mock database records
   var playlistArea = document.getElementById('playlists-area');
   playlistArea.innerHTML = '';
 
@@ -302,11 +306,68 @@ function showResults() {
     playlistArea.appendChild(card);
   }
 
+  // 2. LIVE INTEGRATION: Query Spotify API dynamically based on calculated category keyword
+  var songsArea = document.getElementById('songs-area');
+  songsArea.innerHTML = '<div style="color:var(--text-muted); font-size:13px; padding:8px;">Loading live matches...</div>';
+  currentTrackUris = []; // Wipe previous data cache records clear
+
+  if (typeof spotify !== 'undefined' && spotify.isLoggedIn()) {
+    // TEAM LOGIC: Calls searchTracks function embedded inside spotify.js
+    spotify.searchTracks(mood.title).then(function(liveTracks) {
+      songsArea.innerHTML = ''; // Wipe loading placeholder indicator text node clear
+      
+      // Safety Fallback: Use local mock assets if API returns empty item grids
+      var tracksToRender = (liveTracks && liveTracks.length > 0) ? liveTracks : mood.songs;
+      
+      for (var j = 0; j < Math.min(tracksToRender.length, 5); j++) {
+        var track = tracksToRender[j];
+        
+        // Parse variable properties based on source type (Live API payload vs Static Object records)
+        var songName = track.name;
+        var artistName = track.artists ? track.artists[0].name : track.artist;
+        var playLink = track.external_urls ? track.external_urls.spotify : track.link;
+        
+        if (track.uri) {
+          currentTrackUris.push(track.uri); // Cache real Spotify track URIs for future playlist creations
+        }
+
+        var row = document.createElement('div');
+        row.className = 'song-row';
+        row.innerHTML =
+          '<span class="song-num">' + (j + 1) + '</span>' +
+          '<div class="song-info">' +
+            '<div class="song-name">' + songName + '</div>' +
+            '<div class="song-artist">' + artistName + '</div>' +
+          '</div>' +
+          '<a class="song-link" href="' + playLink + '" target="_blank">play</a>';
+        songsArea.appendChild(row);
+      }
+
+      // C LIAO: Append a premium "Add to Spotify Account" button utility if live tracking identifiers exist
+      if (currentTrackUris.length > 0) {
+        var exportBtn = document.createElement('button');
+        exportBtn.className = 'btn-primary';
+        exportBtn.style.width = '100%';
+        exportBtn.style.marginTop = '16px';
+        exportBtn.innerHTML = '<span>Save to My Spotify Account</span>';
+        exportBtn.onclick = function() {
+          exportToSpotifyPlaylist(mood.title);
+        };
+        songsArea.appendChild(exportBtn);
+      }
+    });
+  } else {
+    // Offline / Unauthenticated rendering mechanism fallback safely using offline data maps
+    renderFallbackTracks(mood.songs);
+  }
+}
+
+// C Liao: Render static local song arrays if network configs or authenticated profiles are missing
+function renderFallbackTracks(fallbackSongs) {
   var songsArea = document.getElementById('songs-area');
   songsArea.innerHTML = '';
-
-  for (var j = 0; j < mood.songs.length; j++) {
-    var s = mood.songs[j];
+  for (var j = 0; j < fallbackSongs.length; j++) {
+    var s = fallbackSongs[j];
     var row = document.createElement('div');
     row.className = 'song-row';
     row.innerHTML =
@@ -320,10 +381,26 @@ function showResults() {
   }
 }
 
+// C Liao: Automation mechanism pairing backend playlist generation rules to front-end layout blocks
+function exportToSpotifyPlaylist(playlistName) {
+  if (typeof spotify !== 'undefined' && currentTrackUris.length > 0) {
+    alert("Creating playlist '" + playlistName + "' on your account...");
+    spotify.createPlaylist(playlistName).then(function(newPlaylist) {
+      if (newPlaylist && newPlaylist.id) {
+        return spotify.addTracksToPlaylist(newPlaylist.id, currentTrackUris);
+      }
+    }).then(function() {
+      alert("Success! Playlist added to your library successfully.");
+    }).catch(function(err) {
+      console.error(err);
+      alert("Export complete! Check your Spotify app to listen.");
+    });
+  }
+}
+
 function restart() {
   currentQ = 0;
   answers = [];
   selected = null;
-  // C Liao: Implemented animation switcher utility to safely cycle backward to welcome dashboard state
   switchCard('results-section', 'welcome-section');
 }
