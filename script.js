@@ -137,9 +137,26 @@ var currentQ = 0;
 var answers = [];
 var selected = null;
 
+/* ==========================================================================
+   UI REDESIGN SECTION - CREATED BY C LIAO
+   ========================================================================== */
+// C Liao: Smooth Animated Transition Card Switcher. 
+// Rationale: Replaces instant display toggles with a micro-timeout sequence allowing proper CSS opacity transitions.
+function switchCard(hideId, showId) {
+  document.getElementById(hideId).classList.remove('active');
+  setTimeout(function() {
+    document.getElementById(hideId).style.display = 'none';
+    var showEl = document.getElementById(showId);
+    showEl.style.display = 'block';
+    setTimeout(function() { 
+      showEl.classList.add('active'); 
+    }, 20);
+  }, 200);
+}
+
 function startQuiz() {
-  document.getElementById('welcome-section').style.display = 'none';
-  document.getElementById('quiz-section').style.display = 'block';
+  // C Liao: Applied smooth card transition system instead of hard switching display styles
+  switchCard('welcome-section', 'quiz-section');
   showQuestion();
 }
 
@@ -148,13 +165,20 @@ function showQuestion() {
   document.getElementById('btn-next').disabled = true;
 
   var q = questions[currentQ];
+  
+  // C Liao: Dynamic Progress Bar Indicator Logic.
+  // Rationale: Calculates completion percentage and directly streams it to the fluid progress strip width modifier.
+  var pct = ((currentQ + 1) / questions.length) * 100;
+  document.getElementById('progress-indicator').style.width = pct + '%';
+
   document.getElementById('q-counter').textContent = "Question " + (currentQ + 1) + " of " + questions.length;
   document.getElementById('q-text').textContent = q.text;
 
+  // C Liao: Modified button tracking configurations using modern visual visibility instead of raw block display properties
   if (currentQ == 0) {
-    document.getElementById('btn-back').style.display = 'none';
+    document.getElementById('btn-back').style.visibility = 'hidden';
   } else {
-    document.getElementById('btn-back').style.display = 'inline-block';
+    document.getElementById('btn-back').style.visibility = 'visible';
   }
 
   if (currentQ == questions.length - 1) {
@@ -240,12 +264,29 @@ function getMood() {
 }
 
 function showResults() {
-  document.getElementById('quiz-section').style.display = 'none';
-  document.getElementById('results-section').style.display = 'block';
+  // C Liao: Implemented step transition lifecycle hooks instead of instant layout switching
+  switchCard('quiz-section', 'results-section');
 
   var mood = getMood();
 
   document.getElementById('results-title').textContent = mood.title;
+  var tag = document.getElementById('mood-tag');
+
+  if(mood.title === "Rainy Day Thoughts"){
+    tag.innerHTML = "🌧 Sad Mood";
+  }
+  else if(mood.title === "Beast Mode"){
+    tag.innerHTML = "⚡ High Energy";
+  }
+  else if(mood.title === "Floating"){
+    tag.innerHTML = "🌌 Chill Vibes";
+  }
+  else if(mood.title === "Lets Go Out"){
+    tag.innerHTML = "🎉 Party Mode";
+  }
+  else{
+    tag.innerHTML = "🎵 Personalized Mix";
+  }
   document.getElementById('results-desc').textContent = mood.desc;
 
   var playlistArea = document.getElementById('playlists-area');
@@ -283,6 +324,6 @@ function restart() {
   currentQ = 0;
   answers = [];
   selected = null;
-  document.getElementById('results-section').style.display = 'none';
-  document.getElementById('welcome-section').style.display = 'block';
+  // C Liao: Implemented animation switcher utility to safely cycle backward to welcome dashboard state
+  switchCard('results-section', 'welcome-section');
 }
