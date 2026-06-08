@@ -134,10 +134,8 @@ var answers = [];
 var selected = null;
 var currentTrackUris = []; // TEAM LOGIC: Stores active track URIs for the playlist creation feature
 
-/* ==========================================================================
-   UI REDESIGN SECTION - CREATED BY C LIAO
-   ========================================================================== */
-// C Liao: Smooth Animated Transition Card Switcher.
+// UI updates by C Liao
+// Switch between sections with animation
 function switchCard(hideId, showId) {
   document.getElementById(hideId).classList.remove('active');
   setTimeout(function() {
@@ -150,7 +148,7 @@ function switchCard(hideId, showId) {
   }, 200);
 }
 
-// C Liao: Initial page initialization wrapper checking Spotify URL redirects
+// Check Spotify login redirect
 window.onload = function() {
   if (typeof spotify !== 'undefined') {
     spotify.handleRedirect(); // Automatically intercept incoming tokens from Spotify dashboard redirections
@@ -158,9 +156,9 @@ window.onload = function() {
 };
 
 function startQuiz() {
-  // C Liao: Redirects unauthenticated users to Spotify Account Login if session token is missing
+// Send user to Spotify login if not logged in
   if (typeof spotify !== 'undefined' && !spotify.isLoggedIn()) {
-    spotify.login(); // Triggers the teammate's built-in OAuth login flow
+    spotify.login(); // Spotify login
     return;
   }
   switchCard('welcome-section', 'quiz-section');
@@ -173,7 +171,7 @@ function showQuestion() {
 
   var q = questions[currentQ];
   
-  // C Liao: Dynamic Progress Bar Indicator Logic.
+ // Update progress bar
   var pct = ((currentQ + 1) / questions.length) * 100;
   document.getElementById('progress-indicator').style.width = pct + '%';
 
@@ -273,17 +271,29 @@ function showResults() {
 
   var mood = getMood();
   document.getElementById('results-title').textContent = mood.title;
-
   var tag = document.getElementById('mood-tag');
-  if (mood.title === "Rainy Day Thoughts") { tag.innerHTML = "🌧 Sad Mood"; }
-  else if (mood.title === "Beast Mode")    { tag.innerHTML = "⚡ High Energy"; }
-  else if (mood.title === "Floating")      { tag.innerHTML = "🌌 Chill Vibes"; }
-  else if (mood.title === "Lets Go Out")   { tag.innerHTML = "🎉 Party Mode"; }
-  else                                     { tag.innerHTML = "🎵 Personalized Mix"; }
+
+  if(mood.title === "Rainy Day Thoughts"){
+    tag.innerHTML = "🌧 Sad Mood";
+  }
+  else if(mood.title === "Beast Mode"){
+    tag.innerHTML = "⚡ High Energy";
+  }
+  else if(mood.title === "Floating"){
+    tag.innerHTML = "🌌 Chill Vibes";
+  }
+  else if(mood.title === "Lets Go Out"){
+    tag.innerHTML = "🎉 Party Mode";
+  }
+  else{
+    tag.innerHTML = "🎵 Personalized Mix";
+  }
   document.getElementById('results-desc').textContent = mood.desc;
 
+ // Show playlists
   var playlistArea = document.getElementById('playlists-area');
   playlistArea.innerHTML = '';
+
   for (var i = 0; i < mood.playlists.length; i++) {
     var p = mood.playlists[i];
     var card = document.createElement('a');
@@ -294,55 +304,62 @@ function showResults() {
     playlistArea.appendChild(card);
   }
 
+// Get tracks from Spotify
   var songsArea = document.getElementById('songs-area');
   songsArea.innerHTML = '<div style="color:var(--text-muted); font-size:13px; padding:8px;">Loading live matches...</div>';
-  currentTrackUris = [];
-
-  var keyword = ((answers[3] || '') + ' ' + (answers[2] || '')).trim() || mood.title;
+  currentTrackUris = []; // Clear previous tracks
 
   if (typeof spotify !== 'undefined' && spotify.isLoggedIn()) {
-    spotify.searchTracks(keyword).then(function (liveTracks) {
-      songsArea.innerHTML = '';
+// Search tracks
+    spotify.searchTracks(mood.title).then(function(liveTracks) {
+      songsArea.innerHTML = ''; // Remove loading text
+      
+      // Use default songs if search fails
       var tracksToRender = (liveTracks && liveTracks.length > 0) ? liveTracks : mood.songs;
-
+      
       for (var j = 0; j < Math.min(tracksToRender.length, 5); j++) {
         var track = tracksToRender[j];
-        var songName   = track.name;
+        
+        // Get song info
+        var songName = track.name;
         var artistName = track.artists ? track.artists[0].name : track.artist;
-        var playLink   = track.external_urls ? track.external_urls.spotify : track.link;
-        if (track.uri) { currentTrackUris.push(track.uri); }
+        var playLink = track.external_urls ? track.external_urls.spotify : track.link;
+        
+        if (track.uri) {
+          currentTrackUris.push(track.uri); // Save track URI
+        }
 
         var row = document.createElement('div');
         row.className = 'song-row';
         row.innerHTML =
-            '<span class="song-num">' + (j + 1) + '</span>' +
-            '<div class="song-info">' +
+          '<span class="song-num">' + (j + 1) + '</span>' +
+          '<div class="song-info">' +
             '<div class="song-name">' + songName + '</div>' +
             '<div class="song-artist">' + artistName + '</div>' +
-            '</div>' +
-            '<a class="song-link" href="' + playLink + '" target="_blank">play</a>';
+          '</div>' +
+          '<a class="song-link" href="' + playLink + '" target="_blank">play</a>';
         songsArea.appendChild(row);
       }
 
+      // Add playlist button
       if (currentTrackUris.length > 0) {
         var exportBtn = document.createElement('button');
         exportBtn.className = 'btn-primary';
         exportBtn.style.width = '100%';
         exportBtn.style.marginTop = '16px';
         exportBtn.innerHTML = '<span>Save to My Spotify Account</span>';
-        exportBtn.onclick = function () { exportToSpotifyPlaylist(mood.title); };
+        exportBtn.onclick = function() {
+          exportToSpotifyPlaylist(mood.title);
+        };
         songsArea.appendChild(exportBtn);
       }
-    })
-        .catch(function (err) {
-          renderFallbackTracks(mood.songs);
-        });
+    });
   } else {
     renderFallbackTracks(mood.songs);
   }
 }
 
-// C Liao: Render static local song arrays if network configs or authenticated profiles are missing
+// Show default songs
 function renderFallbackTracks(fallbackSongs) {
   var songsArea = document.getElementById('songs-area');
   songsArea.innerHTML = '';
@@ -361,7 +378,7 @@ function renderFallbackTracks(fallbackSongs) {
   }
 }
 
-// C Liao: Automation mechanism pairing backend playlist generation rules to front-end layout blocks
+// Create playlist in Spotify
 function exportToSpotifyPlaylist(playlistName) {
   if (typeof spotify !== 'undefined' && currentTrackUris.length > 0) {
     alert("Creating playlist '" + playlistName + "' on your account...");
