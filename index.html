@@ -2,27 +2,19 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
   <title>Moodify | Soundtracks for Your Soul</title>
-  
   <link href="https://fonts.googleapis.com/css?family=Plus+Jakarta+Sans:wght=400;500;700;800&display=swap" rel="stylesheet">
-  
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
   <div class="glass-container">
-    
+    <!-- UI updates -->
     <div id="welcome-section" class="app-card active">
-      
       <div class="logo-badge">MOODIFY</div>
-      
       <h1>Soundtracks for Your Soul</h1>
-      
       <p class="subtitle">Answer a few dynamic questions and let us curate the perfect audio escape aligned with your current headspace.</p>
-      
       <button class="btn-primary main-launch" onclick="startQuiz()">
         <span>Start Sonic Match</span>
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -31,53 +23,48 @@
       </button>
     </div>
 
+    <!-- Quiz page -->
     <div id="quiz-section" class="app-card">
-      
       <div class="quiz-header">
         <span class="logo-badge-sm">MOODIFY</span>
-        
         <span id="q-counter" class="counter-tag">Question 1 of 5</span>
       </div>
-      
+
+    <!-- Progress bar -->
       <div class="progress-bar-container">
         <div id="progress-indicator" class="progress-indicator"></div>
       </div>
-      
       <h2 id="q-text" class="question-title">How are you feeling right now?</h2>
-      
       <div id="options-area" class="options-grid"></div>
-      
       <div class="quiz-footer">
         <button id="btn-back" class="btn-secondary" onclick="goBack()">Back</button>
-        
         <button id="btn-next" class="btn-primary" onclick="goNext()" disabled>Next</button>
       </div>
     </div>
 
+    <!-- Results page -->
     <div id="results-section" class="app-card">
-      
       <div class="logo-badge-sm">YOUR CURATED SONIC ESCAPE</div>
-      
       <h2 id="results-title" class="gradient-text">Here is Your Mix</h2>
-      
+
+      <!-- Mood label -->
       <div id="mood-tag" class="logo-badge" style="margin-top: 10px; margin-bottom: 20px;"></div>
-      
       <p id="results-desc" class="results-summary">We picked some standard masterpieces based on your energy level.</p>
-      
       <div class="results-layout">
-        
+
+        <!-- Playlist recommendations -->
         <div class="results-column">
           <h3>Featured Playlists</h3>
           <div id="playlists-area" class="playlists-stack"></div>
         </div>
-        
+
+        <!-- Spotify recommendations -->
         <div class="results-column">
           <h3>Curated Tracks</h3>
           <div id="songs-area" class="songs-list"></div>
         </div>
-        
       </div>
-
+      <!-- Restart button -->
       <button class="btn-secondary btn-restart" onclick="restart()">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
@@ -85,9 +72,8 @@
         <span>Reset Experience</span>
       </button>
     </div>
-
   </div>
-  <script src="spotify.js"></script>
+
   <script src="script.js"></script>
 </body>
 </html>
